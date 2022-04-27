@@ -1,0 +1,18 @@
+<nav class="navbar  navbar-dark bg-dark">
+    <div class="container-fluid col-3">
+        <a class="navbar-brand" href="/homepage">
+        </a>
+    </div>
+    <div class="container-fluid col-9 pr-1 d-flex justify-content-center 2">
+        <a class="navbar-brand px-2" href="/services">Services</a>
+        <a class="navbar-brand px-2" href="/devis">Devis en Ligne</a>
+        <a class="navbar-brand px-2" href="/">Contact</a>
+        <a class="navbar-brand px-2" href="/">A Propos</a>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+				<a class="navbar-brand px-2" href="{{ url('app_logout') }}">Logout</a>
+		{% else %}
+				<a class="navbar-brand px-2" href="{{ url('app_login') }}">Login</a>
+		{% endif %}
+
+    </div>
+</nav>
