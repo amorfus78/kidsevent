@@ -1,47 +1,48 @@
 <?php 
 namespace App\Controller\Admin;
 
-use App\Entity\Reservations;
-use App\Form\ReservationsType;
-use App\Repository\ReservationsRepository;
+use App\Entity\Supplements;
+use App\Repository\SupplementsRepository;
+use App\Form\SupplementsType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
+
+
 #[Route('/admin')]
 
-class ReservationsController extends AbstractController{
+class SupplementsController extends AbstractController{
 
-
-    // injecter le service ReservationsRepository
-	public function __construct(private ReservationsRepository $reservationsRepository, private RequestStack $requestStack, private EntityManagerInterface $entityManager)
+    // injecter le service SupplementsRepository
+	public function __construct(private SupplementsRepository $supplementsRepository, private RequestStack $requestStack, private EntityManagerInterface $entityManager)
 	{
 		
 	}
 
 
-    #[Route('/reservations', name:'admin.reservations.index')]
+    #[Route('/supplements', name:'admin.supplements.index')]
     public function index():Response
     {
         // récupérer toutes les entrées de la table supplement
-		$results = $this->reservationsRepository->findAll();
+		$results = $this->supplementsRepository->findAll();
 		//dd($results);
 
-		return $this->render('admin/reservations/index.html.twig', [
+		return $this->render('admin/supplements/index.html.twig', [
 			'results' => $results
         ]);
     }
 
-    #[Route('/reservations/form', name:'admin.reservations.form')]
-	#[Route('/reservations/form/{id}', name:'admin.reservations.form.update')]
+    #[Route('/supplements/form', name:'admin.supplements.form')]
+	#[Route('/supplements/form/{id}', name:'admin.supplements.form.update')]
 	public function form(int $id = null):Response
 	{
 		// instances : classe de formulaire et l'entité
-		$type = ReservationsType::class;
+		$type = SupplementsType::class;
 
 		// si l'id est null, un thème est en train d'être ajouté, sinon il est modifié
-		$entity = $id ? $this->reservationsRepository->find($id) : new Reservations();
+		$entity = $id ? $this->supplementsRepository->find($id) : new Supplements();
 
 		// création du formulaire
 		$form = $this->createForm($type, $entity);
@@ -65,37 +66,37 @@ class ReservationsController extends AbstractController{
 
 			// message de confirmation
 			// message flash : message stocké en session
-			$message = $id ? 'Réservation modifiée' : 'Réservation créé';
+			$message = $id ? 'Supplément modifié' : 'Supplément créé';
 			$this->addFlash('notice', $message);
 			//dd($form);
 
 			// redirection vers une route
-			return $this->redirectToRoute('admin.reservations.index');
+			return $this->redirectToRoute('admin.supplements.index');
 
 		}
 		// afficher la vue
-		return $this->render('admin/reservations/form.html.twig', [
+		return $this->render('admin/supplements/form.html.twig', [
 			'form' => $form->createView(),
 			]);
 		
 	}
 
 	// supprimer un theme
-	#[Route('/reservations/remove/{id}', name: 'admin.reservations.remove')]
+	#[Route('/supplements/remove/{id}', name: 'admin.supplements.remove')]
 	public function remove(int $id):Response
 	{
 		// sélectionner l'entité
-		$entity = $this->reservationsRepository->find($id);
+		$entity = $this->supplementsRepository->find($id);
 
 		// supprimer l'entité sélectionnée
 		$this->entityManager->remove($entity);
 		$this->entityManager->flush();
 
 		// message de confirmation
-		$this->addFlash('notice', 'Réservation supprimée');
+		$this->addFlash('notice', 'Supplément supprimé');
 
 		// redirection
-		return $this->redirectToRoute('admin.reservations.index');
+		return $this->redirectToRoute('admin.supplements.index');
 	}
 
 }
