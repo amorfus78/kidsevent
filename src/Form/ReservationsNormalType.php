@@ -12,26 +12,12 @@ use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 
-class ReservationsType extends AbstractType
+class ReservationsNormalType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // liste des champs de formulaire à afficher
         $builder
-            ->add('theme_id', IntegerType::class, [
-                'constraints' => [
-                    new NotBlank([
-                        'message' => "L'idTheme est vide",
-                    ])
-                ],
-            ])
-            ->add('user_id', IntegerType::class, [
-                'constraints' => [
-                    new NotBlank([
-                        'message' => "L'IdClient est vide",
-                    ]),
-                ],
-            ])
             ->add('date_reservee', DateTimeType::class, [
                 'widget' => 'single_text',
                 // this is actually the default format for single_text

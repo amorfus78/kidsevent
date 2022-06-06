@@ -14,10 +14,10 @@ class Reservations
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    private $idTheme;
+    private $themeId;
 
     #[ORM\Column(type: 'integer')]
-    private $idClient;
+    private $userId;
 
     #[ORM\Column(type: 'date')]
     private $dateReservee;
@@ -27,26 +27,26 @@ class Reservations
         return $this->id;
     }
 
-    public function getIdTheme(): ?int
+    public function getThemeId(): ?int
     {
-        return $this->idTheme;
+        return $this->themeId;
     }
 
-    public function setIdTheme(int $idTheme): self
+    public function setThemeId(int $themeId): self
     {
-        $this->idTheme = $idTheme;
+        $this->themeId = $themeId;
 
         return $this;
     }
 
-    public function getIdClient(): ?int
+    public function getUserId(): ?int
     {
-        return $this->idClient;
+        return $this->userId;
     }
 
-    public function setIdClient(int $idClient): self
+    public function setUserId(int $userId): self
     {
-        $this->idClient = $idClient;
+        $this->userId = $userId;
 
         return $this;
     }

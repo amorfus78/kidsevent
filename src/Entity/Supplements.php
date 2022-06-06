@@ -62,4 +62,9 @@ class Supplements
 
         return $this;
     }
+
+    public function toString():string
+    {
+        return $this->nom.' , '.$this->prix.' €';
+    }
 }

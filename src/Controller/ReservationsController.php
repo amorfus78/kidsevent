@@ -1,12 +1,13 @@
 <?php 
-namespace App\Controller\Admin;
+namespace App\Controller;
 
 use App\Entity\Reservations;
 use App\Entity\Supplements;
 use App\Entity\ReservationsSupplements;
-use App\Form\ReservationsType;
+use App\Form\ReservationsNormalType;
 use App\Form\SupplementsChoiceType;
 use App\Repository\ReservationsRepository;
+use App\Repository\ThemesRepository;
 use App\Repository\ReservationsSupplementsRepository;
 use App\Repository\SupplementsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +17,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form;
 
-#[Route('/admin')]
 
 class ReservationsController extends AbstractController{
 
@@ -25,6 +25,7 @@ class ReservationsController extends AbstractController{
 	public function __construct(
 		private ReservationsRepository $reservationsRepository,
 		private SupplementsRepository $supplementsRepository,
+		private ThemesRepository $themesRepository,
 		private ReservationsSupplementsRepository $reservationsSupplementsRepository,
 		private RequestStack $requestStack,
 		private EntityManagerInterface $entityManager)
@@ -33,27 +34,26 @@ class ReservationsController extends AbstractController{
 	}
 
 
-    #[Route('/reservations', name:'admin.reservations.index')]
+    #[Route('/reservations', name:'reservations.index')]
     public function index():Response
     {
-        // récupérer toutes les entrées de la table supplement
+        // récupérer toutes les entrées de la table réservations pour cet utilisateur
 		$results = $this->reservationsRepository->findAll();
 		//dd($results);
 
-		return $this->render('admin/reservations/index.html.twig', [
+		return $this->render('reservations/index.html.twig', [
 			'results' => $results
         ]);
     }
 
-    #[Route('/reservations/form', name:'admin.reservations.form')]
-	#[Route('/reservations/form/{id}', name:'admin.reservations.form.update')]
-	public function form(int $id = null):Response
+    #[Route('/reservations/new/{id}', name:'reservations.new')]
+	public function form(int $id):Response
 	{
 		// instances : classe de formulaire et l'entité
-		$type = ReservationsType::class;
+		$type = ReservationsNormalType::class;
 
 		// si l'id est null, un thème est en train d'être ajouté, sinon il est modifié
-		$entity = $id ? $this->reservationsRepository->find($id) : new Reservations();
+		$entity = new Reservations();
 
 		// création du formulaire
 		$form = $this->createForm($type, $entity);
@@ -65,53 +65,31 @@ class ReservationsController extends AbstractController{
 		if($form->isSubmitted() && $form->isValid()){
 			
 			
-			// l'entité est automatiquement remplie
-			//dd($entity);
-			/*
-				insérer l'entité dans la table
-					- persist : la requête sql est en file d'attente
-					- flush : exécuter la file d'attente des requêtes
-			*/
+			$entity->setThemeId($id);
+			$entity->setUserId($this->getUser()->getId());
 			$this->entityManager->persist($entity);
 			$this->entityManager->flush();
 
 			// message de confirmation
 			// message flash : message stocké en session
-			$message = $id ? 'Réservation modifiée' : 'Réservation créé';
+			$message = 'Réservation créé';
 			$this->addFlash('notice', $message);
 			//dd($form);
 
 			// redirection vers une route
-			return $this->redirectToRoute('admin.reservations.index');
+			return $this->redirectToRoute('reservations.index');
 
 		}
 		// afficher la vue
-		return $this->render('admin/reservations/form.html.twig', [
+		return $this->render('reservations/form.html.twig', [
 			'form' => $form->createView(),
 			]);
 		
 	}
 
-	// supprimer un theme
-	#[Route('/reservations/remove/{id}', name: 'admin.reservations.remove')]
-	public function remove(int $id):Response
-	{
-		// sélectionner l'entité
-		$entity = $this->reservationsRepository->find($id);
-
-		// supprimer l'entité sélectionnée
-		$this->entityManager->remove($entity);
-		$this->entityManager->flush();
-
-		// message de confirmation
-		$this->addFlash('notice', 'Réservation supprimée');
-
-		// redirection
-		return $this->redirectToRoute('admin.reservations.index');
-	}
 
 	// Voir les suppléments
-	#[Route('/reservations/supplements/{id}', name: 'admin.reservations.supplements')]
+	#[Route('/reservations/supplements/{id}', name: 'reservations.supplements')]
 	public function addSupplement(int $id):Response
 	{
 		// sélectionner les suppléments
@@ -157,4 +135,29 @@ class ReservationsController extends AbstractController{
 			]);
 	
 	}
+
+    #[Route('/reservations/devis/{id}', name: 'reservations.devis')]
+	public function getDevis(int $id):Response
+	{
+
+        $supplementsLiens = $this->reservationsSupplementsRepository->findBy(array('reservationsId' => $id));
+        $suppArray = array();
+        $item = 0;
+        $reservation = $this->reservationsRepository->find($id);
+        $theme = $this->themesRepository->find($reservation->getId());
+        $price = $theme->getPrix();
+        foreach ($supplementsLiens as $suppl){
+            $supplement = $this->supplementsRepository->find($suppl->getSupplementsId());
+            array_push($suppArray, $supplement);
+            $price += $supplement->getPrix();
+        } 
+
+        return $this->render('reservations/devis.html.twig', [
+			'supplem' => $suppArray,
+            'theme' => $theme,
+            'prix' => $price
+			]);
+	
+    }
+
 }

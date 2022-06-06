@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\SuppLiaison;
+use App\Entity\ReservationsSupplements;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -16,18 +16,18 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method SuppLiaison[]    findAll()
  * @method SuppLiaison[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SuppLiaisonRepository extends ServiceEntityRepository
+class ReservationsSupplementsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SuppLiaison::class);
+        parent::__construct($registry, ReservationsSupplements::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(SuppLiaison $entity, bool $flush = true): void
+    public function add(ReservationsSupplements $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -39,7 +39,7 @@ class SuppLiaisonRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(SuppLiaison $entity, bool $flush = true): void
+    public function remove(ReservationsSupplements $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {

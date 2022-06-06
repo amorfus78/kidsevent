@@ -4,10 +4,8 @@
         </a>
     </div>
     <div class="container-fluid col-9 pr-1 d-flex justify-content-center 2">
-        <a class="navbar-brand px-2" href="/services">Services</a>
-        <a class="navbar-brand px-2" href="/devis">Devis en Ligne</a>
-        <a class="navbar-brand px-2" href="/">Contact</a>
-        <a class="navbar-brand px-2" href="/">A Propos</a>
+        <a class="navbar-brand px-2" href="/">Accueil</a>
+        <a class="navbar-brand px-2" href="/themes">Themes</a>
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
 				<a class="navbar-brand px-2" href="{{ url('app_logout') }}">Logout</a>
 		{% else %}
